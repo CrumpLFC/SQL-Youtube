@@ -1,0 +1,109 @@
+CREATE TABLE student
+(student_id serial,
+first_name varchar,
+last_name varchar,
+birthday date,
+phone varchar);
+
+CREATE TABLE cathedra
+(cathedra_id serial,
+cathedra_name varchar,
+dean varchar);
+
+ALTER  TABLE student
+ADD COLUMN middle_name varchar;
+
+ALTER TABLE student
+ADD COLUMN rating float;
+
+ALTER TABLE student
+ADD COLUMN enrolled date;
+
+ALteR TABLE student
+DROP COLUMN middle_name;
+
+ALTER TABLE cathedra
+RENAME TO chair;
+
+ALTER TABLE chair
+RENAME cathedra_id TO chair_id;
+
+ALTER TABLE chair
+RENAME cathedra_name TO chair_name;
+
+ALTER TABLE student
+ALTER COLUMN first_name SET DATA TYPE varchar(64);
+ALTER TABLE student
+ALTER COLUMN last_name SET DATA TYPE varchar(64);
+ALTER TABLE student
+ALTER COLUMN phone SET DATA TYPE varchar(30);
+
+CREATE TABLE faculty
+(faculty_id serial,
+faculty_name varchar);
+INSERT INTO faculty(faculty_name)
+VALUES
+('faculty 1'),
+('faculty 2'),
+('faculty 3');
+
+SELECT * FROM faculty;
+TRUNCATE TABLE faculty RESTART IDENTITY
+DROP TABLE faculty
+
+
+CREATE TABLE customer
+( customer_id serial,
+ full_name text,
+ status char DEFAULT 'r',
+ CONSTRAINT PK_customer_customer_id PRIMARY KEY(customer_id),
+ CONSTRAINT CHK_customer_status CHECK (status = 'r' OR status = 'p'));
+INSERT INTO customer(full_name)
+VALUES
+('name');
+SELECT * FROM customer;
+
+--SEQUENCES
+CREATE TABLE customer
+(customer_id serial,
+ full_name text,
+ status char DEFAULT 'r'
+ CONSTRAINT PK_customer_customer_id PRIMARY KEY(customer_id),
+ CONSTRAINT CHK_customer_status CHECK (status = 'r' OR status = 'p'));
+
+INSERT INTO customer(full_name)
+VALUES
+('name');
+
+SELECT * FROM customer;
+
+CREATE SEQUENCE seq1;
+
+SELECT nextval('seq1');
+SELECT currval('seq1');
+SELECT lastval();
+
+SELECT setval('seq1', 16, false);
+SELECT currval('seq1');
+SELECT nextval('seq1');
+
+CREATE SEQUENCE IF NOT EXISTS seq2 INCREMENT 16;
+SELECT nextval('seq2');
+
+CREATE SEQUENCE IF NOT EXISTS seq3
+INCREMENT 16
+MINVALUE 0
+MAXVALUE 128
+START WITH 0;
+
+SELECT nextval('seq3');
+
+ALTER SEQUENCE seq3 RENAME TO seq4;
+ALTER SEQUENCE seq4 RESTART WITH 16;
+
+SELECT nextval('seq4');
+DROP SEQUENCE seq4;
+DROP TABLE customer;
+
+SEQUENCES AND TABLES
+
