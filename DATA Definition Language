@@ -51,7 +51,7 @@ SELECT * FROM faculty;
 TRUNCATE TABLE faculty RESTART IDENTITY
 DROP TABLE faculty
 
-
+---
 CREATE TABLE customer
 ( customer_id serial,
  full_name text,
@@ -62,6 +62,14 @@ INSERT INTO customer(full_name)
 VALUES
 ('name');
 SELECT * FROM customer;
+
+---еще констрейт с чеком
+ALTER TABLE book
+ADD COLUMN weight decimal CONSTRAINT chk_book_weight CHECK (weight > 0 AND weight < 100);
+
+--и еще
+ALTER TABLE products
+ADD CONSTRAINT chk_products_price CHECK(unit_price>0);
 
 --SEQUENCES
 CREATE TABLE customer
@@ -75,8 +83,15 @@ INSERT INTO customer(full_name)
 VALUES
 ('name');
 
-SELECT * FROM customer;
+-- модифицировать колонку products, что бы product_id стал auto_increment
 
+CREATE SEQUENCE IF NOT EXISTS products_product_id_seq
+START WITH 78 OWNED BY products.product_id;
+
+ALTER TABLE products
+ALTER COLUMN product_id SET DEFAULT nextval('products_product_id_seq');
+
+---
 CREATE SEQUENCE seq1;
 
 SELECT nextval('seq1');
@@ -105,5 +120,57 @@ SELECT nextval('seq4');
 DROP SEQUENCE seq4;
 DROP TABLE customer;
 
-SEQUENCES AND TABLES
+---вставка данных в новую таблицу
+SELECT * INTO best_authors
+FROM author 
+WHERE rating >= 4.5;
+
+--массовый инсерт в одну таблицу из другой
+INSERT INTO best_authors
+SELECT *
+FROM author
+WHERE rating < 4.5;
+
+---вставка данных в новую таблицу
+SELECT * INTO best_authors
+FROM author 
+WHERE rating >= 4.5;
+
+
+--массовый инсерт в одну таблицу из другой
+INSERT INTO best_authors
+SELECT *
+FROM author
+WHERE rating < 4.5;
+
+--обновление строки
+UPDATE author
+SET full_name ='Elis', rating = 5
+WHERE author_id = 1;
+
+--удаление
+DELETE FROM author
+WHERE rating < 4.5;
+
+--уничтожение данных, не пишет логов сервер
+TRUNCATE author;
+
+
+-- returning - показывает результат по операции
+DROP TABLE book
+CREATE TABLE book
+(book_id serial,
+	title text NOT NULL,
+	isbn character varying(32) NOT NULL,
+	publisher_id integer NOT NULL,
+	CONSTRAINT PK_book_book_id PRIMARY KEY(book_id));
+
+INSERT INTO book(title, isbn, publisher_id)
+VALUES ('title','isbn',3)
+RETURNING *
+
+UPDATE author
+SET full_name = 'Walter', rating = 5
+WHERE author_id = 1
+RETURNING author_id
 
