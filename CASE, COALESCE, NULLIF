@@ -1,0 +1,29 @@
+-- запросим product name and unit price когда units in stock >= 100 то
+-- в 3 стобце выведем lots of, если >= 50 and <= 100 выведем average
+-- а если <50 то low number, а в противном случае напишем unknown
+
+SELECT product_name, unit_price, units_in_stock,
+      CASE WHEN units_in_stock >= 100 THEN 'lots of'
+	       WHEN units_in_stock >= 50 AND units_in_stock <= 100 THEN 'average'
+		   WHEN units_in_stock < 50 THEN 'low number'
+		   ELSE 'unknown'
+	   END AS amount
+FROM products
+ORDER BY units_in_stock DESC;	  
+	 
+--выбрать из таблицы orders id order date  и наименование месяца этой даты
+SELECT order_id, order_date,
+    CASE WHEN date_part('month', order_date) BETWEEN 3 and 5 THEN 'spring'
+	     WHEN date_part('month', order_date) BETWEEN 6 and 8 THEN 'summer'
+		 WHEN date_part('month', order_date) BETWEEN 9 and 11 THEN 'autumn'
+		 ELSE 'winter'
+    END AS season
+FROM orders;
+
+--из продуктов выбрать наименования продуктов и вывести колонку, которая будет говорить, дорогой он или нет
+SELECT product_name, unit_price,
+CASE WHEN unit_price >= 30 THEN 'expensive'
+     ELSE 'Inexpensive'
+	 END as price_desct
+FROM products;
+
