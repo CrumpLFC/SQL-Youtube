@@ -1,0 +1,62 @@
+--функция для замены значений региона 0 на неизвестен
+CREATE OR REPLACE FUNCTION fix_customer_region() 
+RETURNS void AS $$ 
+UPDATE tmp_customers
+SET region = 'unknown'
+WHERE region IS null
+$$ LANGUAGE SQL;
+
+-- функция, которая возвращает количество всех продуктов в сумме
+CREATE OR REPLACE FUNCTION get_total_number_of_goods() RETURNS bigint AS $$
+SELECT SUM(units_in_stock)
+FROM products
+$$ LANGUAGE SQL;
+
+SELECT get_total_number_of_goods()AS total_goods;
+
+-- функция, которая считает среднюю цену по всем продуктам
+CREATE OR REPLACE FUNCTION get_avg_price_of_goods() RETURNS real AS $$
+SELECT AVG(unit_price)
+FROM products
+$$ LANGUAGE SQL;
+
+SELECT get_avg_price_of_goods() AS avg_price;
+
+--функция, которая фильтрует продукты по имени, дадим возможность клиентскому коду передать ам наименование продуктов
+-- и вернем для этого продукта unit_price
+CREATE OR REPLACE FUNCTION get_product_price_by_name(prod_name varchar) RETURNS real AS $$
+    SELECT unit_price
+	FROM products
+	WHERE product_name = prod_name
+$$ LANGUAGE SQL;
+
+SELECT get_product_price_by_name('Chocolade');
+
+-- клиентский код хочет получить границы цены среди всех продуктов
+CREATE OR REPLACE FUNCTION get_price_boundaries(OUT max_price real, OUT min_price real) AS $$
+   SELECT MAX(unit_price), MIN(unit_price)
+   FROM products
+$$ LANGUAGE SQL;
+
+SELECT get_price_boundaries()
+SELECT * FROM get_price_boundaries();
+
+--функция, которая возвращает границы цены по discontinued 
+CREATE OR REPLACE FUNCTION get_price_boundaries_by_dicontinuty(IN is_discontinued int, OUT max_price real, OUT min_price real) AS $$
+   SELECT MAX(unit_price), MIN(unit_price)
+   FROM products
+   WHERE discontinued = is_discontinued
+$$ LANGUAGE SQL;
+
+SELECT get_price_boundaries_by_dicontinuty(1);
+SELECT * FROM get_price_boundaries_by_dicontinuty(1);
+
+--функция, которая возвращает границы цены по discontinued c DEFAULT
+CREATE OR REPLACE FUNCTION get_price_boundaries_by_dicontinuty(IN is_discontinued int DEFAULT 1, OUT max_price real, OUT min_price real) AS $$
+   SELECT MAX(unit_price), MIN(unit_price)
+   FROM products
+   WHERE discontinued = is_discontinued
+$$ LANGUAGE SQL;
+
+--SELECT get_price_boundaries_by_dicontinuty();
+SELECT * FROM get_price_boundaries_by_dicontinuty();
