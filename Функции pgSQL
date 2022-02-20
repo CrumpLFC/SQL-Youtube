@@ -1,0 +1,91 @@
+--функция, которая возвращает сумму товара в продажах
+
+CREATE OR REPLACE FUNCTION get_total_number_of_goods() RETURNS bigint AS $$
+BEGIN 
+     RETURN SUM(units_in_stock)
+	 FROM products;
+
+END;
+$$ LANGUAGE plpgsql
+
+SELECT get_total_number_of_goods();
+
+--вернуть максимальную цену всех продуктов, которые были диконтиньюд
+
+CREATE OR REPLACE FUNCTION get_max_price_from_discontinued() RETURNS real AS $$
+BEGIN 
+     RETURN MAX(unit_price)
+	 FROM products
+     WHERE discontinued = 1;
+END;
+$$ LANGUAGE plpgsql
+
+SELECT get_max_price_from_discontinued();
+
+--ф-я возвр. макс цену по юнит прайс
+CREATE OR REPLACE FUNCTION get_price_boundaries (OUT max_price real, OUT min_price real) AS $$
+BEGIN
+     --max_price := MAX(unit_price) FROM products;
+	 -- min_price := MIN(unit_price) FROM products;
+     SELECT MAX(unit_price), MIN(unit_price)
+	 INTO max_price, min_price
+	 FROM products;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT get_price_boundaries();
+
+--функция, которая принимает 2 инта и складывает их
+CREATE OR REPLACE FUNCTION get_sum(x int, y int, out result int) AS $$
+BEGIN
+    result := x + y;
+	RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_sum (3, 4);
+
+--функция, которая возвращает клиентов, фильтруя по стране
+CREATE OR REPLACE FUNCTION get_customers_by_country(customer_country varchar) 
+RETURNS SETOF customers AS $$ 
+BEGIN
+    RETURN QUERY
+	SELECT *
+	FROM customers
+	WHERE country = customer_country;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_customers_by_country('UK');
+
+--ф-я вычисляет площадь треугольника по 3м сторонам
+CREATE OR REPLACE FUNCTION get_square(ab real, bc real, ac real) RETURNS real AS $$
+DECLARE 
+     perimeter real;
+BEGIN
+perimeter = (ab+bc+ac) / 2;
+return sqrt(perimeter * (perimeter - ab)*(perimeter - bc)*(perimeter - ac));
+
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT get_square(7,7,7);
+
+--средняя цена по продуктам, с коэфами по границам
+CREATE FUNCTION calc_middle_price() RETURNS SETOF products AS $$
+DECLARE
+    avg_price real;
+	low_price real;
+	high_price real;
+BEGIN
+   SELECT AVG(unit_price) INTO avg_price
+   FROM products;
+   low_price = avg_price * 0.75;
+   high_price = avg_price * 1.25;
+   RETURN QUERY 
+   SELECT * FROM products
+   WHERE unit_price BETWEEN low_price AND high_price;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM calc_middle_price();
